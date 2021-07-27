@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.2/css/all.min.css" integrity="sha512-HK5fgLBL+xu6dm/Ii3z4xhlSUyZgTT9tuc/hSrtw6uzJOvgRr2a9jyxxT1ely+B+xFAmJKVSTbpM/CuL7qxO8w==" crossorigin="anonymous" />
+    <link rel="preconnect" href="https://fonts.gstatic.com">
+    <link href="https://fonts.googleapis.com/css2?family=Open+Sans:wght@300;400;600&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="./assets/css/style.css">
+    <link rel="shortcut icon" href="#">
+    <title>Music player</title>
+
+</head>
+<body>
+    <!-- Width: 270; Height: 64 -->
+    <div class="main">
+        <!-- Dashboard -->
+        <div class="dashboard">
+            <!-- Name of the song which is playing -->
+            <div class="playing-song">
+                <span>Now playing:</span>
+                <h3></h3>
+            </div>
+
+            <!-- CD of that song -->
+            <div class="cd">
+                <div class="cd-thumb cd-thumb--image"></div>
+                <div class="cd-thumb cd-thumb--shadow"></div>
+            </div>
+
+            <!-- Control buttons -->
+            <div class="control">
+                <div class="btn btn-repeat">
+                    <i class="fas fa-redo"></i>
+                </div>
+                <div class="btn btn-prev">
+                    <i class="fas fa-step-backward"></i>
+                </div>
+                <div class="btn btn-main">
+                    <i class="fas fa-play"></i> 
+                    <i class="fas fa-pause"></i>
+                </div>
+                <div class="btn btn-next">
+                    <i class="fas fa-step-forward"></i>
+                </div>
+                <div class="btn btn-random">
+                    <i class="fas fa-random"></i>
+                </div>
+            </div>
+
+            <!-- Status -->
+            <input id="progress" class="progress" type="range" value="0" min="0" max="100" step="0.1">
+
+            <!-- Audio -->
+            <audio id= "audio" src=""></audio>
+        </div>
+
+        <div class="playlist">
+        </div>
+    </div>
+
+    <script type="module" src="./assets/js/app.js"></script>
+
+</body>
+</html>
