@@ -1,3 +1,10 @@
+Array.prototype.swap = function (x,y) {
+    var b = this[x];
+    this[x] = this[y];
+    this[y] = b;
+    return this;
+}
+
 import songs from './songs.js'
 
 const $ = document.querySelector.bind(document)
@@ -122,7 +129,7 @@ const app = {
     handleSongList: function(songs) {
         const actions = {
             initialSongs: [...songs],
-            currentSong: 0,
+            indexOfCurrentSong: 0,
             listSongs: [],
 
             renderList: function() {
@@ -145,19 +152,28 @@ const app = {
                 actions.listSongs = [...$$('.song')]
             },
 
-            // Load songs[id] lên dashboard
-            loadSong: function(id, callback) {
-                // Thêm class vào
-                actions.listSongs[actions.currentSong].classList.remove('song--playing')
-                actions.currentSong = id
-                actions.listSongs[id].classList.toggle('song--playing')
-            
-                // Scroll đến bài hát vừa load
+            scrollToSong: function(id) {
                 actions.listSongs[id].scrollIntoView({
                     behavior: "smooth",
                     block: "end",
                     inline: "nearest"
                 });
+            },
+
+            // Đánh dấu bài hát được phát trong list (thêm class)
+            markSongToPlay: function(id) {
+                actions.listSongs[actions.indexOfCurrentSong].classList.remove('song--playing')
+                actions.indexOfCurrentSong = id
+                actions.listSongs[id].classList.toggle('song--playing')
+            },
+
+            // Load songs[id] lên dashboard
+            loadSongToDashBoard: function(id, callback) {
+                // Đánh dấu bài hát chuẩn bị được phát
+                actions.markSongToPlay(id)
+            
+                // Scroll đến bài hát vừa load
+                actions.scrollToSong(id)
 
                 // Cập nhật nội dung thẻ HTML
                 playingSong.textContent = songs[id].name
@@ -182,7 +198,7 @@ const app = {
             },
 
             // Tự động phát khi chuyển bài
-            autoPlay: function() {
+            playSong: function() {
                 audio.play()
                 app.isPlaying = true
                 if (!playBtn.classList.contains('btn--play')) {
@@ -193,20 +209,20 @@ const app = {
             // Next song
             nextSong: function() {
                 nextBtn.onclick = function() {
-                    let id = actions.currentSong
+                    let id = actions.indexOfCurrentSong
                     id++
                     if (id == songs.length) id = 0
-                    actions.loadSong(id, actions.autoPlay)
+                    actions.loadSongToDashBoard(id, actions.playSong)
                 }
             },
 
             // Previous song
             prevSong: function() {
                 prevBtn.onclick = function() {
-                    let id = actions.currentSong
+                    let id = actions.indexOfCurrentSong
                     id--
                     if (id < 0) id = songs.length - 1
-                    actions.loadSong(id, actions.autoPlay)
+                    actions.loadSongToDashBoard(id, actions.playSong)
                 }
             },
 
@@ -220,7 +236,7 @@ const app = {
                     if (!e.target.closest('.song-option')) {
                         let parent = e.target.closest('.song')
                         if (parent) {
-                            actions.loadSong(actions.listSongs.indexOf(parent), actions.autoPlay)
+                            actions.loadSongToDashBoard(actions.listSongs.indexOf(parent), actions.playSong)
                         }
                     }
                 }
@@ -234,29 +250,36 @@ const app = {
                         // Shuffle mảng songs
                         function randomAtIndex(array, index) {
                             let j = Math.floor(Math.random() * (index + 1))
-                            let temp = array[index]
-                            array[index] = array[j]
-                            array[j] = temp
+                            songs.swap(j, index)
                         }
+
+                        songs.swap(actions.indexOfCurrentSong, songs.length - 1)
 
                         let direction = Math.random()
                         if (direction >= 0.5) {
-                            for (let i = songs.length - 1; i >= 0; i--) {
+                            for (let i = songs.length - 2; i >= 0; i--) {
                                 randomAtIndex(songs, i)
                             }
                         }
                         else {
-                            for (let i = 0; i < songs.length; i++) {
+                            for (let i = 0; i < songs.length - 1; i++) {
                                 randomAtIndex(songs, i)
                             }
                         }
+
+                        songs.swap(songs.length - 1, 0)
+                        actions.indexOfCurrentSong = 0
                     }
                     else {
                         // Render lại danh sách ban đầu (từ database)
+                        let temp = songs[actions.indexOfCurrentSong]
                         songs = [...actions.initialSongs]
-                    }
+                        actions.indexOfCurrentSong = songs.indexOf(temp)
+                    }                    
+                    
+                    actions.scrollToSong(actions.indexOfCurrentSong)
                     actions.renderList(songs)
-                    actions.loadSong(0, actions.autoPlay)
+                    actions.markSongToPlay(actions.indexOfCurrentSong)
                 }
             },
 
@@ -280,7 +303,7 @@ const app = {
 
             execute: function() {
                 this.renderList()
-                this.loadSong(0)
+                this.loadSongToDashBoard(0)
                 this.chooseSong()
                 this.nextSong()
                 this.prevSong()
